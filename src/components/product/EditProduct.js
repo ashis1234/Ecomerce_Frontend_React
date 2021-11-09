@@ -81,7 +81,7 @@ export default function EditProduct(props) {
         axios.put(`http://127.0.0.1:8000/products/product/${id}/`, {
             title:productName,
             price:price,
-            seller:"ashis",
+            seller:localStorage.getItem('username'),
             description:productDescription,
             digital:digital,
             tags:tags1,

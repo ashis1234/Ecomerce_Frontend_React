@@ -4,7 +4,8 @@ import Exmpales from "./card";
 import {Grid} from "@material-ui/core"
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-
+import styled from "styled-components";
+import { Paper } from "@material-ui/core";
 // export default function ProductList(props){
 //     const [Apidata,setApidata] = useState([])
 //     const SetCartCount = props.SetCartCount
@@ -33,7 +34,8 @@ import Select from '@material-ui/core/Select';
 //     )
 // };
 
-
+import messageArr from '../utils/message';
+import { ToastContainer, toast } from 'react-toastify';
 import React, { useEffect, useState } from "react";
 import Pagination from "@material-ui/lab/Pagination";
 export default function ProductList(props){
@@ -42,16 +44,41 @@ export default function ProductList(props){
     const [total_pages,setTotal_pages] = useState(0)
     const [pageSize,setpageSize] = useState(3)
     const SetCartCount = props.SetCartCount
+    const CartCount = props.CartCount
+    
     const Searchquery = props.Searchquery
     const [pageSizes,setpageSizes] = useState([3,6,9])    
     const [order,setOrder] = useState('')
     // const [tags,setTags] = useState('')
-    
+    const [change,setChange] = useState(false)
     let tags = '';
     if('match' in props)
         tags = props.match.params.name;
     
     useEffect(()=>{
+
+        if(messageArr.length){
+            setChange(false);
+            const msg = messageArr[messageArr.length-1];
+            if(msg.status === 'success'){
+              toast.success(msg.body,{
+                position:"top-right",
+              });
+            }else if(msg.status === 'info'){
+              toast.info(msg.body,{
+                position:"top-right",
+              });
+            }else{
+              toast.error(msg.body,{
+                position:"top-right",
+    
+              });
+            }
+            messageArr.pop();
+          }
+
+
+
         let url = `http://127.0.0.1:8000/products/product/?page=${page}&&query=${Searchquery}&&size=${pageSize}`
         if(order)
             url += `&&order=${order}`;
@@ -76,11 +103,19 @@ export default function ProductList(props){
             setApidata([]);
         });
     },[order,Searchquery, page,total_pages,pageSize,tags])
-
+    
+    const Item = styled(Paper)(({ theme }) => ({
+      ...theme.typography.body2,
+      padding: theme.spacing(2),
+      textAlign: 'center',
+      color: theme.palette.text.secondary,
+    }));
+    
   
     return (
       <div>
         <div>
+            <ToastContainer/>
             <Select
                 style ={{float:'right',width:"30",marginBottom:"20px"}}
                 id="product sort based on some key"
@@ -96,10 +131,10 @@ export default function ProductList(props){
 
             </Select>
             
-            <Grid  container spacing={{ xs: 4, md: 3 }} >
+            <Grid  container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                  {Apidata.map((row, index) => (
-                     <Grid item xs={2} sm={4} md={4} key={index}>
-                         <Exmpales SetCartCount = {SetCartCount} product = {row}/>
+                     <Grid item  xs={2} sm={4} md={4} key={index} >
+                         <Exmpales CartCount= {CartCount} SetCartCount = {SetCartCount} product = {row}/>
                          <hr/>
                      </Grid>
                  ))}

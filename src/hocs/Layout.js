@@ -14,7 +14,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Link,NavLink } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-
+import styled from "styled-components";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -82,7 +82,10 @@ export default function Layout(props) {
   const SetCartCount = props.SetCartCount
   const CartCount = props.CartCount
   const SetSearchquery = props.SetSearchquery
+  const userName = props.userName
+  const setUserName = props.setUserName
   
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -90,7 +93,14 @@ export default function Layout(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
+  const StyledLink = styled(Link)`
+    font-size:20px;
+    color:white;
+    &:hover{
+      text-decoration:none;
+      color:black;
+    }
+`;
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -111,9 +121,9 @@ export default function Layout(props) {
           <MenuIcon />
           </IconButton>
           <Typography>
-            <Link className="navbar-brand" to='/'>Seamless</Link>
+            <StyledLink className="navbar-brand" to='/'>Eshop</StyledLink>
           </Typography>
-          <Navbar SetSearchquery = {SetSearchquery} CartCount = {CartCount} SetCartCount = {SetCartCount}/>
+          <Navbar setUserName = {setUserName} userName = {userName} SetSearchquery = {SetSearchquery} CartCount = {CartCount} SetCartCount = {SetCartCount}/>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -132,10 +142,12 @@ export default function Layout(props) {
         </div>
 
         <Divider />
+        {localStorage.getItem('username') &&
         <List>
             <NavLink className="nav-link" exact to='/products'>Product</NavLink>
             
         </List>
+        }
       </Drawer>
       <main
         className={clsx(classes.content, {

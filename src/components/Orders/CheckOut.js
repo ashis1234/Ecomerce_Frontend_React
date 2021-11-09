@@ -6,6 +6,9 @@ import { useHistory } from "react-router";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ClearIcon from '@material-ui/icons/Clear';
 import { Card,CardContent,CardActions } from "@material-ui/core";
+import AdressForm from "./CheckoutFrom";
+import Payment from "./Payment";
+import CheckoutItem from './CheckoutItem';
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -141,82 +144,56 @@ const SummaryItemPrice = styled.span``;
 
 
 
-export default function CartView (props){
-
+export default function CheckoutView (props){
   const [Apidata,setApidata] = useState([])
   const [quantity,setQuantity] = useState(0)
   const [price,setPrice] = useState(0)
   const [orderId,setorderId] = useState(0)
-
+  const [AddressId,setAdressId] = useState(0)
+  const SetCartCount = props.SetCartCount
 
   useEffect(()=>{
-    axios.get("http://127.0.0.1:8000/orders/cartview/ashis/").then((response)=>{
+    const name = localStorage.getItem('username');
+    axios.get(`http://127.0.0.1:8000/orders/cartview/${name}/`).then((response)=>{
         const data = response.data
         setorderId(data.id)
         setApidata(data.orderitem_set)
         setQuantity(data.quantity)
         setPrice(data.price)
     })
-  },[quantity])
+  },[quantity,setAdressId])
+
 
   const history = useHistory();
-
   return (
     <Container>
       <Wrapper>
         <Title>CHECKOUT PAGE</Title>
         <Top>
-          <Button startIcon = {<ArrowBackIcon/>} variant = "contained" color = "primary" onClick = {()=>{history.push('/')}}>CONTINUE SHOPPING</Button>
-          <TopText>Shopping Bag(2)</TopText>
-          <TopText>Your Wishlist (0)</TopText>
-          <Button  variant = "contained" style={{  "background-color": "#007fff"}} onClick = {()=>{history.push(`/checkout/${orderId}`)}}>PLACE ORDER</Button>
+          <Button startIcon = {<ArrowBackIcon/>} variant = "contained" color = "primary" onClick = {()=>{history.push('/cart')}}>Go To Cart</Button>
         </Top>
         <Bottom>
           <Info>
-            <Card sx={{ minWidth: 275 }}>
+            <Card >
               <CardContent>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                    DELIVAERY ADRESSS
-                </Typography>
-                
+                <AdressForm setAdressId={setAdressId}/>
+                <br/>
+                {AddressId>0 && <Payment price={40+price} SetCartCount={SetCartCount} AddressId={AddressId} orderId={orderId}/>}
               </CardContent>
-              <CardActions>
-                <Button size="small">Learn More</Button>
-              </CardActions>
             </Card>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
-            {Apidata.map((row)=>(
-              <>
-              <Product id= {row.product.id}>
-                <ProductDetail>
-                  <Image src="https://picsum.photos/1200/500"/>
-                  <Details>
-                    <ProductName>
-                      <b>Product:</b>{row.product.title}
-                    </ProductName>
-                    <ProductId>
-                      <b>ID:</b> {row.id}
-                    </ProductId>
-                    <ProductPrice><img src="http://i.stack.imgur.com/nGbfO.png" width="15" height="25"/>{row.product.price}</ProductPrice>
-                  </Details>
-                </ProductDetail>
-                <PriceDetail>
-                <ProductAmountContainer>
-                    <ClearIcon/>
-                    <ProductAmount>{row.quantity}</ProductAmount>
-                </ProductAmountContainer>
-                <ProductPrice1><img src="http://i.stack.imgur.com/nGbfO.png" width="15" height="25"/>{ row.product.price*row.quantity}</ProductPrice1>
-              </PriceDetail>
-              </Product>
-              <Hr />
-            </>
-            ))}           
-          </Info>
+              {Apidata.map((row,index)=>(
+                <>
+                  <CheckoutItem  productid={row.product.id} quantity = {row.quantity} id = {row.id?row.id:index}/>
+                  <Hr />
+                </>
+              ))}  
+            </Info>
           <Summary>
             <SummaryTitle>PRICE DETAILS</SummaryTitle>
             <hr/>
             <Product>
-              <Typography variant="h6" component="div" gutterBottom>Price()</Typography>
+              <Typography variant="h6" component="div" gutterBottom>Price({quantity})</Typography>
               <Typography variant="h5" component="div"><img src="http://i.stack.imgur.com/nGbfO.png" width="15" height="25"/>{price}</Typography>
             </Product>
             <br/>
@@ -229,7 +206,6 @@ export default function CartView (props){
               <Typography variant="h6" component="div" gutterBottom>Total Payable</Typography>
               <Typography variant="h5" component="div"><img src="http://i.stack.imgur.com/nGbfO.png" width="15" height="25"/>{40+price}</Typography>
             </Product>
-            <Button  variant = "contained" style={{  "background-color": "#007fff"}} onClick = {()=>{history.push(`/checkout/${orderId}`)}}>PLACE ORDER</Button>
           </Summary>
         </Bottom>
       </Wrapper>

@@ -79,7 +79,8 @@ export default function ProductListSeller() {
   const [change,setChange] = useState(false);
   
   useEffect(() => {
-      axios.get(`http://127.0.0.1:8000/products/seller/ashis`)
+    const name = localStorage.getItem('username')
+      axios.get(`http://127.0.0.1:8000/products/seller/${name}`)
           .then((response) => {
               setApiData(response.data);
           })

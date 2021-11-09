@@ -31,17 +31,10 @@ export default function Exmpales(props) {
         setImage(`http://127.0.0.1:8000`+product.image.toString())
   })
   
-  const AddToCart = ()=>{
-    axios.post("http://127.0.0.1:8000/orders/addtocart/",{
-      username:"ashis",
-      pname:title
-    }).then((response)=>{
-        SetCartCount(response.data.quantity);
-    })
-  }
+  
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card style={{padding:"10px"}} sx={{ maxWidth: 345 }}>
       <CardHeader 
         title={<Link to = {`/products/view/${product.id}`} style = {{'text-decoration': 'none',
           '&:focus, &:hover, &:visited, &:link, &:active' :{
@@ -75,12 +68,6 @@ export default function Exmpales(props) {
         <IconButton aria-label="share">
           <ShareIcon />
         </IconButton>
-        <Button
-          color = "primary"
-          onClick = {AddToCart}
-          variant = "contained"
-          endIcon={<AddShoppingCart/>}
-        >Add To Cart</Button>
       </CardActions>
     </Card>
   );

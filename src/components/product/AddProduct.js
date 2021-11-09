@@ -20,7 +20,7 @@ export default function AddProduct() {
     const [price,setPrice] = useState(0)
     const [tags, setTags] = useState([]);
     const [digital,setDigital] = useState(0)
-
+    const userName = localStorage.getItem('username')
 
     let history = useHistory();
     const [TAGS,setTAGS] = useState([])
@@ -49,7 +49,7 @@ export default function AddProduct() {
         axios.post('http://127.0.0.1:8000/products/product/', {
             title:productName,
             price:price,
-            seller:"ashis",
+            seller:userName,
             description:productDescription,
             digital:digital,
             tags:tags1,
@@ -110,7 +110,6 @@ export default function AddProduct() {
                     />
                     <FormHelperText id="pname-helper">Enter Tags of the product</FormHelperText>
                     <br/>
-
                     <Checkbox id="digital" onChange = {(e)=>{setDigital(e.target.checked)}}/>
                     <br/>
                     <Button 

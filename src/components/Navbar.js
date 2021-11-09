@@ -1,4 +1,4 @@
-import { Badge } from "@material-ui/core";
+import { Badge, Button } from "@material-ui/core";
 import { ShoppingCartOutlined } from "@material-ui/icons";
 import React,{useEffect, useState} from "react";
 import styled from "styled-components";
@@ -76,16 +76,42 @@ export default function Navbar(props){
   const quantity = props.CartCount
   const SetCartCount = props.SetCartCount
   const SetSearchquery = props.SetSearchquery
-
+  const setUserName = props.setUserName
+  const userName = props.userName
+  const [token,setToken] = useState('')
+  
   useEffect(()=>{
-    axios.get("http://127.0.0.1:8000/orders/getTotalQuantity/ashis/").then((response)=>{
-      SetCartCount(response.data.quantity);
-    })
-  },[quantity])
+    if(localStorage.getItem('tokens'))
+      setToken(localStorage.getItem('tokens'));
+    if(localStorage.getItem('username')){
+      console.log("from navbar")
+      axios.get(`http://127.0.0.1:8000/orders/getTotalQuantity/${userName}/`).then((response)=>{
+        SetCartCount(response.data.quantity);
+      })
+    }else if(localStorage.getItem('quantity')){
+      SetCartCount(parseInt(localStorage.getItem('quantity')));
+    }else{
+      localStorage.setItem('quantity',0);
+      SetCartCount(0);
+    }
+  },[quantity,token])
 
   const [value,setValue] = useState('')
   const doSomethingWith = ()=>{
     SetSearchquery(value);
+  }
+
+  const logOut = ()=>{
+    axios.post("http://127.0.0.1:8000/users/logout/",{
+        refresh:localStorage.getItem('token'),
+      }).then(()=>{
+          setUserName('')
+          setToken('')
+          SetCartCount(0);
+          localStorage.clear();
+      }).catch((error)=>{
+          console.log(error);
+    })
   }
 
   return (  
@@ -97,8 +123,18 @@ export default function Navbar(props){
             onRequestSearch={doSomethingWith}
           />
           </MenuItem>
-          <MenuItem><StyledLink to = {'/register'}>REGISTER</StyledLink></MenuItem>
-          <MenuItem><StyledLink to = {'/login'}>SIGNIN</StyledLink></MenuItem>
+          {userName?    
+            <>        
+              <MenuItem><StyledLink to = {'/'}>{userName}</StyledLink></MenuItem>
+              <MenuItem onClick={logOut}>Logout</MenuItem>
+              
+            </>
+            :
+            <>
+              <MenuItem><StyledLink to = {'/register'}>REGISTER</StyledLink></MenuItem>
+              <MenuItem><StyledLink to = {'/login'}>SIGNIN</StyledLink></MenuItem>
+            </>
+          }
           <MenuItem>
             <Badge badgeContent={quantity} color="primary">
               <StyledLink to = {'/cart'}> <ShoppingCartOutlined /></StyledLink>
